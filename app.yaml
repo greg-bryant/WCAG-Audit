@@ -1,0 +1,26 @@
+application: wcag-audit
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+
+- url: /favicon\.ico
+  static_files: images/favicon.ico
+  upload: images/favicon\.ico
+
+- url: /ext
+  static_dir: ext
+
+- url: /js
+  static_dir: js
+
+- url: /(.*).txt
+  static_files: \1.txt
+  upload: (.*).txt
+
+- url: /.*
+  script: wcag-audit.app
+
+

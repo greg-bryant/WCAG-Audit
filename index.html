@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>WCAG-Audit</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></script>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/highcharts.js"></script>
+  <script>
+
+  function makeChart(id_with_hash_sign,errors) {
+    $(id_with_hash_sign).highcharts({
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            labels: {
+                enabled:false
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'errors'
+            },
+            allowDecimals: false,
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            shared: true,
+            useHTML: true,
+            headerFormat: '',
+            pointFormat: '{point.y}'
+        },
+        series: [{
+            showInLegend: false, 
+            name: '',
+            data: errors
+        }]
+    });
+  };
+  </script>
+
+
+</head>
+<body style="font-family:sans-serif;">
+<font size="+3"><a href="/"><b>WCAG-Audit</b></a></font>
+<br/><br/>
+
+{% if not group %}
+ <!-- home page -->
+ <div style="padding:15px">
+ Use this tool to <b>publicly track your efforts</b> to make your webapps and websites<br/>
+ <b>conform to WCAG 2.0.</b> To do so, you will use a version of the Google Chrome <br/>
+ Accessibility audit extension, modified to send audit errors to this site. This site<br/>
+ then keeps this record of errors, so you can demonstrate improvement over time.<br/>
+ <br/>
+ To <b>install</b> the tool in chrome:<br/>
+ Go to <b>chrome://flags</b> in your browser.<br/>
+ Enable the flag <b>Experimental Extension APIs</b><br/>
+ Download the <b>extension.crx</b> file 
+ <a href="/ext/extension.crx" 
+    aria-label="This is a link for downloading the extension.crx file.">here</a>.<br/>
+ Your browser will complain and put it in your downloads folder.<br/>
+ Go to <b>chrome://extensions</b> in your browser.<br/>
+ Drag the <b>extension.crx</b> file over your <b>chrome://extensions</b> page.<br/>
+
+ <br/>To <b>use</b>:<br/>
+ Go to the webpage you want to evaluate.<br/>
+ Launch Chrome's developer tools.<br/>
+ Select Audits tab.</br>
+ Check "WCAG-Audit" and Run.<br/>
+ Then <b>repeat</b> as necessary:<br/>
+ &nbsp;&nbsp;<i>Fix an accessibility bug.<br/>
+ &nbsp;&nbsp;Check "WCAG-Audit" and Run.</i><br/>
+ The trend of your work will be on a page accessible<br/>
+ from one of the links below. You can use this to demonstrate<br/>
+ your efforts to conform to the WCAG 2.0 standard.<br/>
+ <a href="/group/http%3A%2F%2Fwcag-audit.appspot.com%2F"
+    aria-label=
+    "This is an example of an application using this tool to show error reduction."
+    target="_blank"
+    ><b>An example.</b></a><br/>
+ </div>
+ <br/>
+ <hr/><br/>
+ {% for ag in audit_groups %}
+  &nbsp;&nbsp;
+  <b>
+   <a href="/group/{{ ag.url_safe}}"
+      aria-label="Audit results for {{ag.no_prefix_url}}" 
+      target="_blank">
+     {{ag.no_prefix_url}}
+   </a>
+  </b>
+  <br/>
+ {% endfor %}
+  <br/><br/><hr/><br/>
+  <div style="padding:15px">
+  A free, public service.<br/>
+  Based on Google Chrome's Accessibility Audit.<br/>
+  Free software, Apache 2.0 License.<br/>
+  <a href="https://github.com/greg-bryant/accessibility-developer-tools-extension"
+      aria-label="A fork of the Google Chrome Accessibility Extension." 
+      target="_blank">
+     Extension fork.<a/><br/>
+
+  <a href="https://github.com/greg-bryant/WCAG-Audit"
+      aria-label="Server software for this web service." 
+      target="_blank">
+  Server software.</a><br/>
+  by <a href="https://education.uoregon.edu/users/gregory-bryant"
+      aria-label="Greg Bryant" 
+      target="_blank">
+     Greg Bryant<a/> with<br/>
+     John Fuller, Joseph Boland, Seth May,<br/>
+     Noah Talmadge, and Bryan Adams --<br/>
+     of the <a href="http://www.uoregon.edu"
+		   aria-label="University of Oregon" 
+		   target="_blank"
+		   >University of Oregon</a>,<br/>
+     <a href="http://education.uoregon.edu"
+		   aria-label="College of Education" 
+		   target="_blank"
+		   >
+     College of Education<a/>.<br/>
+
+  </div>
+
+{% else %}
+ <!-- audit group page -->
+
+  <div style="height:200px;width:40%;" id="chart"></div>
+  <script>
+   makeChart("#chart",{{total_array}});
+  </script>
+  <br/>
+  {% for audit in audit_group %}
+   <font size="+2"><b>{{ audit.url|safe }} <br/> {{ audit.timestamp }} GMT</b></font>
+   <br/>
+   <span style="padding-left:15px">
+     {% for result in audit.report.results %}
+       <br/>&nbsp;&nbsp;<b>({{result.severity}})</b>&nbsp;{{result.ruleHeading}}&nbsp;
+       <b>({{result.failures}})</b>&nbsp;[{{result.ruleName}}]
+     {% endfor %}
+     <br/><br/>Number of rules failed: 
+     <b>{{ audit.report.failedRules }}</b>
+     <br/>Error total: 
+     <b>{{audit.errors}}</b>
+   </span> 
+   <br/><br/>
+   <br/><br/>
+  {% endfor %}
+
+
+{% endif %}
+
+</body>
+</html>
